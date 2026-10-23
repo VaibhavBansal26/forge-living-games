@@ -12,7 +12,7 @@ npm run build
 npm start
 ```
 
-Open http://localhost:4173. For development use `npm run dev`. The backend and frontend share port 4173. The running app is already available during this Codex session.
+Open http://localhost:4173. For development use `npm run dev`. The backend and frontend share port 4173. 
 
 ## Try the complete flow
 
@@ -67,7 +67,7 @@ npm run build
 
 The test suite starts a separate server on port 4174 with a temporary database. It checks authentication and authorization, schema validation, conflicting saves, collaboration broadcasts, immutable publication, two-client gameplay completion, distance checks, direct/unlisted links, private access, bookmarks, avatars and cross-origin mutations. It does not replace production security or load testing.
 
-Browser evidence and visual comparisons are in `qa/`; the visual review is in `design-qa.md`.
+Browser evidence is retained locally in the ignored `qa/` directory. The visual review is in `design-qa.md`.
 
 ## Wizard Battle Chess
 
@@ -104,7 +104,7 @@ A free account and Wrangler authorization are required to publish. After authori
 
 ### Chess verification
 
-`npm test` now runs 20 tests across the original builder and chess modes. Chess tests cover command parsing, special chess rules, single-seat claims, ownership/turn/spectator restrictions, stale commands, enemy-piece dialogue rejection, capture events, saved-state reconnect, and a complete two-client checkmate. Browser checks additionally verified typed orders, an enemy king refusing commands, own king/rook dialogue, two-player move delivery, and the renderer reaching its stone-shattering animation phase.
+`npm test` now runs 21 tests across the original builder and chess modes. Chess tests cover command parsing, special chess rules, single-seat claims, ownership/turn/spectator restrictions, stale commands, enemy-piece dialogue rejection, capture events, saved-state reconnect, and a complete two-client checkmate. Browser checks additionally verified typed orders, an enemy king refusing commands, own king/rook dialogue, two-player move delivery, and the renderer reaching its stone-shattering animation phase.
 
 ### Computer matches and phones
 
