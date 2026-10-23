@@ -1,0 +1,31 @@
+{
+  "name": "forge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server/index.mjs",
+    "build": "vite build && node scripts/prepare-sites-build.mjs",
+    "preview": "vite preview",
+    "test:sites": "node --test tests/sites-worker.test.mjs",
+    "start": "NODE_ENV=production node server/index.mjs",
+    "test": "node --test --test-concurrency=1 tests/core.test.mjs tests/chess.test.mjs",
+    "dev:cloudflare": "wrangler dev --local",
+    "check:cloudflare": "wrangler deploy --dry-run",
+    "test:cloudflare": "node scripts/test-cloudflare.mjs"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@vitejs/plugin-react": "5.0.4",
+    "chess.js": "^1.4.0",
+    "express": "^5.3.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "three": "^0.186.1",
+    "vite": "6.4.2",
+    "ws": "^8.22.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.152.0"
+  }
+}

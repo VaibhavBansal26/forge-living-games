@@ -1,0 +1,26 @@
+import express from 'express';
+import {mountChess} from './chess.mjs';
+import {mountCore} from './core.mjs';
+import {mountWorldSockets} from './world-sockets.mjs';
+import {createServer} from 'node:http';
+import {WebSocketServer} from 'ws';
+import {DatabaseSync} from 'node:sqlite';
+import {scryptSync,timingSafeEqual} from 'node:crypto';
+import {mkdirSync} from 'node:fs';
+import {resolve,dirname} from 'node:path';
+const dbPath=process.env.DB_PATH||resolve('data/forge.sqlite');mkdirSync(dirname(dbPath),{recursive:true});
+const db=new DatabaseSync(dbPath);db.exec('PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;');
+const originSetting=process.env.PUBLIC_ORIGIN||process.env.RENDER_EXTERNAL_URL;
+const publicOrigin=originSetting?new URL(originSetting).origin:null;
+const app=express();app.disable('x-powered-by');app.use(express.json({limit:'512kb'}));
+app.use((req,res,next)=>{res.setHeader('X-Content-Type-Options','nosniff');if(['POST','PUT','DELETE'].includes(req.method)&&req.headers.origin&&req.headers.origin!==`${req.secure?'https':'http'}://${req.headers.host}`&&req.headers.origin!==publicOrigin)return res.status(403).json({error:'Origin not allowed'});next();});
+const passwords={hash:(p,s)=>scryptSync(p,s,64).toString('hex'),verify:(p,s,h)=>{const a=scryptSync(p,s,64);return !!h&&h.length===128&&timingSafeEqual(a,Buffer.from(h,'hex'));}};
+let worlds;const {auth,userFor,readable}=mountCore(app,db,{passwords,publicOrigin,broadcast:(...args)=>worlds?.broadcast(...args)});
+const server=createServer(app);
+mountChess(app,server,{db,auth,userFor,publicOrigin});
+worlds=mountWorldSockets(server,{db,userFor,readable,publicOrigin,WebSocketServer});
+app.get('/api/health',(req,res)=>res.json({ok:true}));
+app.use('/api',(err,req,res,next)=>{console.error(err.message);res.status(500).json({error:'The request could not be completed.'});});
+if(process.env.NODE_ENV==='production')app.use(express.static(resolve('dist/client')));else{const {createServer:createVite}=await import('vite');const vite=await createVite({server:{middlewareMode:true},appType:'spa'});app.use(vite.middlewares);}
+if(process.env.NODE_ENV==='production')app.get('/{*path}',(req,res)=>res.sendFile(resolve('dist/client/index.html')));
+server.listen(Number(process.env.PORT)||4173,'0.0.0.0',()=>console.log(`FORGE running at http://localhost:${process.env.PORT||4173}`));
