@@ -1,6 +1,12 @@
 # FORGE
 
-A local, working web MVP for discovering, building, publishing, and playing small 3D adventure worlds. Combines a warm community browser, a focused dark world editor, and direct avatar controls.
+A working web MVP for discovering, building, publishing, and playing small 3D adventure worlds. Combines a warm community browser, a focused dark world editor, and direct avatar controls.
+
+## Play online
+
+[Open FORGE](https://forge-living-games.vaibhavbansal024.workers.dev/) · [Wizard Battle Chess](https://forge-living-games.vaibhavbansal024.workers.dev/?view=chess)
+
+Hosted on Cloudflare Workers Free. Create an account, then choose a friend match or computer match. Friend invitations use the public HTTPS address and can be shared through WhatsApp. Free usage limits apply.
 
 ## Run
 
@@ -40,16 +46,16 @@ Open http://localhost:4173. For development use `npm run dev`. The backend and f
 
 ## Explicit limits
 
-This is a local single-server MVP, not a production service or a native packaged application.
+This is a small-community MVP, not a native packaged application. The Cloudflare deployment uses one durable coordinator.
 
 - Three built-in kits and reusable procedural meshes are included. Custom AI-generated themes/models, user uploads, rigged clothing, advanced animations and a general asset marketplace are not implemented. Gallery art is illustrative cover art, not screenshots of the low-poly runtime.
 - Avatar customization is colors and an explorer hat, not arbitrary face/body/wardrobe modeling.
 - Collaboration synchronizes saved project versions. It does not merge simultaneous object edits via CRDTs or implement object leases. An unsaved local edit is protected by a revision-conflict response.
-- Multiplayer is cooperative exploration for up to eight connections per room, not an arbitrary competitive networking engine. Physics uses simple proximity/collision rules. Rooms and progress are held in memory and expire when empty or on server restart. Disconnected sessions require rejoining; no automatic reconnection is claimed.
+- Multiplayer is cooperative exploration for up to eight connections per room, not an arbitrary competitive networking engine. Physics uses simple proximity/collision rules. On Node, rooms and progress are held in memory and expire when empty or on restart. Cloudflare preserves active room progress across hibernation; empty rooms expire. Disconnected sessions require rejoining; no automatic reconnection is claimed.
 - The scene builder supports the crystal hunt / configurable interact-and-collect rules. Wizard Battle Chess is a separate implemented game mode. Racing, platforming, terrain sculpting and arbitrary script execution are not supported.
 - Native APK/AAB, iOS, macOS and Windows builds are not produced. Export downloads project JSON, not an executable.
 - AI generation, n8n, LangChain and CrewAI integrations are intentionally not connected; the core product is usable without tokens or provider credentials.
-- Account verification/recovery, moderation/report handling, abuse protection beyond basic throttling, billing, production TLS, distributed room ownership, backups and production monitoring remain deployment work.
+- Account verification/recovery, moderation/report handling, abuse protection beyond basic throttling, billing, distributed room ownership, backups and production monitoring remain deployment work.
 - Included creator identities are fictional examples, marked DEMO. The locally created Studio Explorer account and Willowbrook Adventure project are browser-verification fixtures.
 
 ## Data and deployment
@@ -90,15 +96,15 @@ A localhost invitation works only on the host computer. A friend using a phone n
 
 A Dockerfile is included for a persistent single-server deployment. Mount persistent storage at `/app/data`, set `PUBLIC_ORIGIN` to the exact HTTPS origin (for example `https://your-game.example`), and forward port 8080 with WebSocket upgrades. Setting `PUBLIC_ORIGIN` allows same-origin mutations behind a TLS reverse proxy and makes authentication cookies Secure. The database must not be stored on an ephemeral filesystem.
 
-The current app has not been publicly deployed. A temporary tunnel, if selected, is suitable for an invitation test and only remains available while its process and this computer stay running. Permanent hosting requires a selected hosting target and persistent disk. Do not deploy the static Sites worker for this multiplayer backend.
+The public deployment uses Cloudflare Workers Free with SQLite-backed Durable Objects, so it does not depend on this computer staying on. Do not deploy the static Sites worker for this multiplayer backend.
 
 ### Free permanent hosting: Cloudflare
 
 The supported free deployment is now `wrangler.jsonc` + `cloudflare/index.mjs`. It serves the React app and puts accounts, project data and chess matches in a SQLite-backed Durable Object. Hibernating WebSockets preserve live connections while idle. The Cloudflare runtime and Node runtime share the API, world and chess rules; the original static Sites worker remains a separate compatibility template and must not be used to host multiplayer.
 
-Use a Cloudflare **Workers Free** account. No paid plan, paid custom domain, payment method or API provider is required by this configuration. Confirm the account is on Workers Free before publication; do not deploy on an existing paid Workers account under the user's zero-spend constraint. Free usage limits can interrupt service when exhausted. No cloud resources have been created yet.
+Use a Cloudflare **Workers Free** account. No paid plan, paid custom domain, payment method or API provider is required by this configuration. Confirm the account is on Workers Free before publication; do not deploy on an existing paid Workers account under the user's zero-spend constraint. Free usage limits can interrupt service when exhausted. The app and its SQLite Durable Object are deployed on the confirmed Free account.
 
-A free account and Wrangler authorization are required to publish. After authorization and plan verification, run `npm run build`, `npm run check:cloudflare`, then `npx wrangler deploy`. The resulting `workers.dev` address is the public invitation origin. No Git repository is required. Local databases and test accounts are excluded from deployment.
+To publish your own copy, use a free account and authorize Wrangler. After plan verification, run `npm run build`, `npm run check:cloudflare`, then `npx wrangler deploy`. The resulting `workers.dev` address is the public invitation origin. No Git repository is required. Local databases and test accounts are excluded from deployment.
 
 `npm run test:cloudflare` starts an isolated local Cloudflare emulator and runs the full API/multiplayer suite against it. `npm run dev:cloudflare` is an optional local preview. The coordinator is sized for a small prototype, not a high-traffic game service. Cloud accounts use salted PBKDF2-SHA256 via Web Crypto; the Node server retains its scrypt password format. Local accounts are not copied to the new host.
 
@@ -110,4 +116,8 @@ A free account and Wrangler authorization are required to publish. After authori
 
 The chess lobby offers **Create multiplayer match** and **Play against computer**. Computer games reserve Obsidian for a built-in two-ply chess engine; a visitor can spectate but cannot take that seat. It evaluates material and pawn advancement, replies with legal moves, and shares the same saved match, animation, and ownership checks as friend matches. This is a basic opponent with one difficulty, not Stockfish or an LLM. No API calls, tokens, or paid services are required. Reopening the match resumes a pending computer turn.
 
-On phones the board stacks above the controls, **Match & orders** jumps to the command panel, inputs avoid automatic text zoom, and key controls use 44-pixel touch targets. Browser verification at 390 × 844 confirmed a computer reply and no horizontal overflow; evidence is `qa/chess-computer-mobile.png`. This is responsive web support, not a native APK/iOS build. Remote friend invites still require the pending free public deployment.
+On phones the board stacks above the controls, **Match & orders** jumps to the command panel, inputs avoid automatic text zoom, and key controls use 44-pixel touch targets. Browser verification at 390 × 844 confirmed a computer reply and no horizontal overflow; evidence is `qa/chess-computer-mobile.png`. This is responsive web support, not a native APK/iOS build. Remote friend invitations now use the public deployment.
+
+### Live deployment verification
+
+Verified over public HTTPS: registration, login, Secure/HttpOnly session cookies, private-project access, two separately authenticated WSS chess players exchanging moves and a capture, enemy-command rejection, saved match retrieval, and a computer reply. Browser checks confirmed live sign-in, restored match history and a WhatsApp invitation containing the hosted URL. No WhatsApp message was sent. Test identities are synthetic; their unpublished project and matches are verification fixtures.

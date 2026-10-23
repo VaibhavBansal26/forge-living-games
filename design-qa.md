@@ -102,3 +102,10 @@ final result: passed
 - Saved account/session and computer-match records survived a stopped/restarted emulator using the same persisted storage.
 - Browser signed in to a test account on port 4176, created a computer match, sent e2–e4 and received a5; no model calls.
 - Cloudflare signup is open for user completion. No Cloudflare account authorization, cloud deployment, live HTTPS or cross-device test has occurred yet. The paid Render configuration was removed.
+
+## Public deployment verified
+- Cloudflare Workers Free plan confirmed in dashboard; no upgrade or billing action performed.
+- Deployed version ebba5337-25ad-4716-8b61-83f72675fadf at https://forge-living-games.vaibhavbansal024.workers.dev.
+- Live HTTPS tests passed: accounts, login, secure cookies, private access, two-player chess moves/capture, enemy-command rejection, saved match, and computer response.
+- Browser signed in using synthetic QA credentials, restored the saved three-move match, and verified the invitation uses the public origin. No message sent.
+- Public invitation evidence retained locally in qa/public-invitation-verified.png.

@@ -26,4 +26,4 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - User explicitly prohibits all paid services. Do not create paid Render resources, enable billing, or upgrade plans. Permanent hosting must stay on a free plan. The paid Render proposal has been removed.
 - Chess must support explicit friend and computer match choices. The computer uses a local rules-based engine with no paid APIs. Preserve mobile play, large controls and the board-to-orders shortcut.
 
-- Free deployment target is Cloudflare Workers with SQLite Durable Objects. Confirm Workers Free account status before publication. Cloudflare account signup and authorization are pending user completion.
+- Free deployment target is Cloudflare Workers with SQLite Durable Objects. Confirm Workers Free account status before publication. The user approved Wrangler deployment access and deployment on the confirmed Workers Free plan. Public app: https://forge-living-games.vaibhavbansal024.workers.dev. Never enable a paid plan.
